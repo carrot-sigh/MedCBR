@@ -1,0 +1,22 @@
+{
+  "rows": 243310,
+  "split_counts": {
+    "train": 237948,
+    "validate": 1959,
+    "test": 3403
+  },
+  "explicit_labels": {
+    "c1": 820139,
+    "c2": 4468245,
+    "severity": 1089819,
+    "c3": 106508
+  },
+  "bbox_slots": 6027617,
+  "missing_images": 0,
+  "split_integrity": {
+    "dicom_overlap": 0,
+    "study_overlap": 0,
+    "subject_overlap": 0,
+    "verified": true
+  }
+}

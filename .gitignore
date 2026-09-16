@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+
+# Local datasets and downloaded archives.
+/data/
+/media/
+
+# Generated Chest ImaGenome data products are local-only by default.
+/workspaces/*
+
+# Keep the small V1 provenance and validation summaries in Git.
+!/workspaces/chest_imagenome_hierarchy_v1/
+/workspaces/chest_imagenome_hierarchy_v1/*
+!/workspaces/chest_imagenome_hierarchy_v1/freeze_metadata.json
+!/workspaces/chest_imagenome_hierarchy_v1/hierarchy_v1.sha256
+!/workspaces/chest_imagenome_hierarchy_v1/manifests/
+/workspaces/chest_imagenome_hierarchy_v1/manifests/*
+!/workspaces/chest_imagenome_hierarchy_v1/manifests/ontology_v1.json
+!/workspaces/chest_imagenome_hierarchy_v1/manifests/manifest_summary.json
+!/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/
+/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/*
+!/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/dataset_validation_report.json
+!/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/tiny_overfit_history.json

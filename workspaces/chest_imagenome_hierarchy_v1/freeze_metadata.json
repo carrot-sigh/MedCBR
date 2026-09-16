@@ -1,0 +1,19 @@
+{
+  "ontology_version": "hierarchy_v1",
+  "status": "frozen",
+  "frozen_date": "2026-09-16",
+  "hash_algorithm": "sha256",
+  "hash_manifest": "hierarchy_v1.sha256",
+  "artifact_directory": "manifests",
+  "frozen_artifacts": [
+    "manifests/train.parquet",
+    "manifests/valid.parquet",
+    "manifests/test.parquet",
+    "manifests/ontology_v1.json",
+    "manifests/manifest_summary.json"
+  ],
+  "experiment_contract": {
+    "ontology_version": "hierarchy_v1",
+    "severity_primary_loss_enabled": false
+  }
+}
