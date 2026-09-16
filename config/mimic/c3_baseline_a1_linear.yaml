@@ -1,0 +1,40 @@
+ontology_version: hierarchy_v1
+seed: 20260916
+device: auto
+use_amp: true
+
+data:
+  manifest_dir: /home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/manifests
+  image_size: 224
+  batch_size: 32
+  num_workers: 8
+  normalize: huggingface
+  clahe: true
+
+model:
+  type: cxrclip_swin_tiny
+  checkpoint: /home/user/gxq/checkpoints/cxr-clip/swint_m.tar
+  source_url: https://twg.kakaocdn.net/brainrepo/models/cxr-clip/a21ef120894e072ae77434daf6b98b72/swint_m.tar
+  expected_sha256: a2e5dec18b80aad726e4e416b99a09d22d7319cfc58323e17130aa4a56b0c13f
+  num_classes: 10
+
+training:
+  epochs: 5
+  freeze_encoder_epochs: 5
+  encoder_lr: 1.0e-5
+  head_lr: 1.0e-4
+  weight_decay: 1.0e-4
+  early_stopping_patience: 2
+  grad_clip_norm: 1.0
+
+output_dir: /home/user/gxq/MedCBR/workspaces/c3_baseline_a1_linear
+
+# Linear-probe baseline: the official CXR-CLIP image encoder remains frozen.
+losses:
+  c3_masked_bce: true
+  clip: false
+  c1: false
+  c2: false
+  severity: false
+  bbox: false
+  report: false
