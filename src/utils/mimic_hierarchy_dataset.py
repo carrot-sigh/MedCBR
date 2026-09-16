@@ -4,8 +4,9 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pyarrow.parquet as pq
@@ -39,15 +40,51 @@ def verify_frozen_hierarchy(manifest_dir: str | Path) -> None:
             raise RuntimeError(f"Frozen hierarchy checksum mismatch: {path}")
 
 
+@dataclass(frozen=True)
+class TransformProfile:
+    """Backbone-specific image preprocessing parameters."""
+
+    normalize: str
+    clahe: bool
+    color_jitter: bool
+    interpolation: InterpolationMode
+    train_crop_scale: tuple[float, float]
+
+
+TRANSFORM_PROFILES = {
+    "cxr_clip": TransformProfile(
+        normalize="huggingface", clahe=True, color_jitter=True,
+        interpolation=InterpolationMode.BILINEAR, train_crop_scale=(0.8, 1.1),
+    ),
+    "vit": TransformProfile(
+        normalize="imagenet", clahe=False, color_jitter=False,
+        interpolation=InterpolationMode.BICUBIC, train_crop_scale=(0.8, 1.0),
+    ),
+    "dinov2": TransformProfile(
+        normalize="imagenet", clahe=False, color_jitter=False,
+        interpolation=InterpolationMode.BICUBIC, train_crop_scale=(0.8, 1.0),
+    ),
+}
+
+
 class CXRImageTransform:
-    """cxr-clip-style preprocessing with synchronized bbox geometry."""
+    """Image preprocessing with synchronized bbox geometry."""
 
     NORMALIZATION = {
         "huggingface": ([0.5] * 3, [0.5] * 3),
         "imagenet": ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     }
 
-    def __init__(self, image_size=224, split="train", normalize="huggingface", clahe=True):
+    def __init__(
+        self,
+        image_size=224,
+        split="train",
+        normalize="huggingface",
+        clahe=True,
+        color_jitter=True,
+        interpolation=InterpolationMode.BILINEAR,
+        train_crop_scale=(0.8, 1.1),
+    ):
         if split not in SPLIT_FILES:
             raise ValueError(f"Unsupported split: {split}")
         if normalize not in self.NORMALIZATION:
@@ -55,7 +92,10 @@ class CXRImageTransform:
         self.image_size = int(image_size)
         self.split = split
         self.clahe = clahe
+        self.apply_color_jitter = color_jitter
         self.color_jitter = ColorJitter(brightness=0.1, contrast=0.2, saturation=0.2, hue=0.1)
+        self.interpolation = interpolation
+        self.train_crop_scale = tuple(train_crop_scale)
         mean, std = self.NORMALIZATION[normalize]
         self.mean = torch.tensor(mean, dtype=torch.float32).view(3, 1, 1)
         self.std = torch.tensor(std, dtype=torch.float32).view(3, 1, 1)
@@ -94,19 +134,23 @@ class CXRImageTransform:
         source_width, source_height = image.size
         if self.split == "train":
             top, left, height, width = RandomResizedCrop.get_params(
-                image, scale=(0.8, 1.1), ratio=(3 / 4, 4 / 3)
+                image, scale=self.train_crop_scale, ratio=(3 / 4, 4 / 3)
             )
             image = TF.resized_crop(
                 image, top, left, height, width, [self.image_size, self.image_size],
-                interpolation=InterpolationMode.BILINEAR, antialias=True,
+                interpolation=self.interpolation, antialias=True,
             )
             bboxes, bbox_mask = self._transform_bboxes(
                 bboxes, bbox_mask, (source_width, source_height),
                 (left, top, width, height), (self.image_size, self.image_size),
             )
-            image = self.color_jitter(self._clahe(image))
+            image = self._clahe(image)
+            if self.apply_color_jitter:
+                image = self.color_jitter(image)
         else:
-            image = TF.resize(image, self.image_size, interpolation=InterpolationMode.BILINEAR, antialias=True)
+            image = TF.resize(
+                image, self.image_size, interpolation=self.interpolation, antialias=True
+            )
             resized_width, resized_height = image.size
             crop_left = int(round((resized_width - self.image_size) / 2.0))
             crop_top = int(round((resized_height - self.image_size) / 2.0))
@@ -128,6 +172,24 @@ class CXRImageTransform:
         return image, torch.from_numpy(bboxes), torch.from_numpy(bbox_mask)
 
 
+def build_transform(profile="cxr_clip", split="train", image_size=224):
+    """Build a bbox-aware transform for a named backbone profile."""
+    try:
+        spec = TRANSFORM_PROFILES[profile]
+    except KeyError as exc:
+        choices = ", ".join(sorted(TRANSFORM_PROFILES))
+        raise ValueError(f"Unknown transform profile {profile!r}; choose one of: {choices}") from exc
+    return CXRImageTransform(
+        image_size=image_size,
+        split=split,
+        normalize=spec.normalize,
+        clahe=spec.clahe,
+        color_jitter=spec.color_jitter,
+        interpolation=spec.interpolation,
+        train_crop_scale=spec.train_crop_scale,
+    )
+
+
 class MIMICHierarchyV1Dataset(Dataset):
     """One MIMIC-CXR JPG with frozen region-level hierarchy supervision."""
 
@@ -137,7 +199,17 @@ class MIMICHierarchyV1Dataset(Dataset):
         "c1_quality_weight", "region_active_c1",
     )
 
-    def __init__(self, manifest_dir, split, image_size=224, normalize="huggingface", clahe=True, verify_hashes=False):
+    def __init__(
+        self,
+        manifest_dir,
+        split,
+        image_size=224,
+        transform_profile="cxr_clip",
+        transform: Callable | None = None,
+        normalize=None,
+        clahe=None,
+        verify_hashes=False,
+    ):
         if split not in SPLIT_FILES:
             raise ValueError(f"Unsupported split: {split}")
         self.manifest_dir = Path(manifest_dir)
@@ -147,7 +219,21 @@ class MIMICHierarchyV1Dataset(Dataset):
         self.ontology_version = ONTOLOGY_VERSION
         self.split = split
         self.table = pq.read_table(self.manifest_dir / SPLIT_FILES[split], memory_map=True)
-        self.transform = CXRImageTransform(image_size, split, normalize, clahe)
+        self.transform_profile = transform_profile
+        if transform is not None and (normalize is not None or clahe is not None):
+            raise ValueError("normalize/clahe overrides cannot be combined with a custom transform")
+        if transform is not None:
+            self.transform = transform
+        elif normalize is not None or clahe is not None:
+            # Preserve compatibility for existing CXR-CLIP callers.
+            if transform_profile != "cxr_clip":
+                raise ValueError("normalize/clahe overrides are only supported for cxr_clip")
+            self.transform = CXRImageTransform(
+                image_size, split, normalize or "huggingface",
+                True if clahe is None else bool(clahe),
+            )
+        else:
+            self.transform = build_transform(transform_profile, split, image_size)
 
     def __len__(self):
         return self.table.num_rows
@@ -187,7 +273,7 @@ def make_mimic_hierarchy_loaders(config):
     verify_frozen_hierarchy(manifest_dir)
     common = {
         "manifest_dir": manifest_dir, "image_size": int(config.data.image_size),
-        "normalize": str(config.data.normalize), "clahe": bool(config.data.clahe),
+        "transform_profile": str(getattr(config.data, "transform_profile", "cxr_clip")),
     }
     datasets = {split: MIMICHierarchyV1Dataset(split=split, **common) for split in SPLIT_FILES}
     workers = int(config.data.num_workers)

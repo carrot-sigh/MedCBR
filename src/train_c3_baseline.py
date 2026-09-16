@@ -122,8 +122,7 @@ def make_loaders(config, rank=0, world_size=1):
     common = {
         "manifest_dir": manifest_dir,
         "image_size": int(data["image_size"]),
-        "normalize": data["normalize"],
-        "clahe": bool(data["clahe"]),
+        "transform_profile": data.get("transform_profile", "cxr_clip"),
     }
     datasets = {
         split: MIMICHierarchyV1Dataset(split=split, **common)

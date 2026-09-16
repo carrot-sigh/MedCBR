@@ -8,8 +8,7 @@ data:
   image_size: 224
   batch_size: 32
   num_workers: 8
-  normalize: huggingface
-  clahe: true
+  transform_profile: cxr_clip
 
 model:
   type: cxrclip_swin_tiny
