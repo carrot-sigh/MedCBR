@@ -394,6 +394,7 @@ def train(config, args):
     if world_size > 1:
         model = DistributedDataParallel(
             model, device_ids=[local_rank], output_device=local_rank,
+            find_unused_parameters=True,
         )
     amp_enabled = bool(config["use_amp"]) and device.type == "cuda"
     scaler = torch.amp.GradScaler(device.type, enabled=amp_enabled)
@@ -451,15 +452,15 @@ def train(config, args):
             stale_epochs = 0
             if is_main:
                 torch.save(
-                {
-                    "model": unwrap_model(model).state_dict(),
-                    "epoch": epoch + 1,
-                    "valid_macro_auprc": score,
-                    "ontology_version": ONTOLOGY_VERSION,
-                    "c3_concepts": class_names,
-                    "checkpoint_metadata": checkpoint_metadata,
-                    "config": config,
-                },
+                    {
+                        "model": unwrap_model(model).state_dict(),
+                        "epoch": epoch + 1,
+                        "valid_macro_auprc": score,
+                        "ontology_version": ONTOLOGY_VERSION,
+                        "c3_concepts": class_names,
+                        "checkpoint_metadata": checkpoint_metadata,
+                        "config": config,
+                    },
                     best_path,
                 )
         else:
@@ -499,6 +500,9 @@ def train(config, args):
         dist.destroy_process_group()
         return None
     save_json(output_dir / "thresholds.json", dict(zip(class_names, thresholds.tolist())))
+    save_json(output_dir / "validation_metrics.json", valid_metrics)
+    save_json(output_dir / "test_metrics.json", test_metrics)
+    save_per_class_csv(output_dir / "per_class_metrics.csv", valid_metrics, test_metrics)
     summary = {
         "best_epoch": best["epoch"],
         "best_valid_macro_auprc": best["valid_macro_auprc"],
