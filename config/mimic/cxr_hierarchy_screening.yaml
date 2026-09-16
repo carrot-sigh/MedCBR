@@ -10,6 +10,9 @@ data:
   num_workers: 8
   transform_profile: cxr_clip
   transform_profile_version: 1
+  screening_train_size: 20000
+  screening_min_positive_per_concept: 200
+  screening_subset_path: /home/user/gxq/MedCBR/workspaces/cxr_hierarchy_screening/train_subset_20k.json
 
 model:
   backbone: cxr_clip_swin_tiny

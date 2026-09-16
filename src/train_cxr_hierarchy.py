@@ -9,10 +9,13 @@ import math
 from pathlib import Path
 
 import numpy as np
+import pyarrow as pa
 import torch
 import torch.distributed as dist
 import yaml
 from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data import DataLoader, Subset
+from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm
 
 from src.models.cxr_c3_baseline import sha256_file
@@ -32,6 +35,7 @@ from src.utils.mimic_hierarchy_dataset import (
     ONTOLOGY_VERSION,
     transform_profile_metadata,
 )
+from src.utils.hierarchy_screening_subset import load_or_create_screening_subset
 
 
 LEVEL_FIELDS = {
@@ -108,14 +112,17 @@ def save_history(path, history):
         writer.writerows(history)
 
 
-def hierarchy_support(dataset, ontology):
+def hierarchy_support(dataset, ontology, indices=None):
     result = {}
+    table = dataset.table
+    if indices is not None:
+        table = table.take(pa.array(indices))
     for level, (_, target_field, mask_field, concept_field) in LEVEL_FIELDS.items():
         concepts = ontology[concept_field]
         positive = np.zeros(len(concepts), dtype=np.int64)
         negative = np.zeros(len(concepts), dtype=np.int64)
         unknown = np.zeros(len(concepts), dtype=np.int64)
-        columns = dataset.table.select([target_field, mask_field])
+        columns = table.select([target_field, mask_field])
         for record_batch in columns.to_batches(max_chunksize=2048):
             target = np.asarray(record_batch.column(0).to_pylist(), dtype=np.int8)
             mask = np.asarray(record_batch.column(1).to_pylist(), dtype=bool)
@@ -134,6 +141,27 @@ def hierarchy_support(dataset, ontology):
             for index, concept in enumerate(concepts)
         ]
     return result
+
+
+def subset_train_loader(config, dataset, indices, rank, world_size):
+    subset = Subset(dataset, indices.tolist())
+    sampler = None
+    if world_size > 1:
+        sampler = DistributedSampler(
+            subset, num_replicas=world_size, rank=rank, shuffle=True,
+            seed=int(config["seed"]), drop_last=False,
+        )
+    workers = int(config["data"]["num_workers"])
+    loader = DataLoader(
+        subset,
+        batch_size=int(config["data"]["batch_size"]),
+        shuffle=sampler is None,
+        sampler=sampler,
+        num_workers=workers,
+        pin_memory=True,
+        persistent_workers=workers > 0,
+    )
+    return loader, sampler
 
 
 def distributed_loss(logits, target, mask, world_size):
@@ -311,6 +339,20 @@ def run(config, args):
     set_seed(int(config["seed"]) + rank)
     datasets, loaders, train_sampler = make_loaders(config, rank, world_size)
     ontology = datasets["train"].ontology
+    subset_indices = None
+    subset_report = None
+    subset_size = config["data"].get("screening_train_size")
+    if subset_size:
+        subset_indices, subset_report = load_or_create_screening_subset(
+            datasets["train"].table,
+            config["data"]["screening_subset_path"],
+            int(subset_size),
+            int(config["seed"]),
+            int(config["data"].get("screening_min_positive_per_concept", 200)),
+        )
+        loaders["train"], train_sampler = subset_train_loader(
+            config, datasets["train"], subset_indices, rank, world_size
+        )
 
     checkpoint_path = Path(config["model"]["checkpoint"])
     digest = sha256_file(checkpoint_path)
@@ -322,10 +364,14 @@ def run(config, args):
     )
     if is_main:
         support = {
-            split: hierarchy_support(dataset, ontology)
+            split: hierarchy_support(
+                dataset, ontology, subset_indices if split == "train" else None
+            )
             for split, dataset in datasets.items()
         }
         save_json(output_dir / "support.json", support)
+        if subset_report is not None:
+            save_json(output_dir / "train_subset_report.json", subset_report)
         save_json(
             output_dir / "resolved_config.json",
             {**config, "world_size": world_size, "checkpoint_sha256": digest,
