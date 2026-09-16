@@ -1,0 +1,638 @@
+{
+  "ontology_version": "hierarchy_v1",
+  "seed": 20260916,
+  "num_train": 237948,
+  "num_valid": 1959,
+  "num_test": 3403,
+  "image_shape": [
+    3,
+    224,
+    224
+  ],
+  "preprocessing": {
+    "train": "load RGB -> RandomResizedCrop(bilinear) -> CLAHE(p=0.5) -> ColorJitter -> CenterCrop(no-op at 224) -> ToTensor -> Normalize",
+    "valid_test": "load RGB -> Resize(bilinear) -> CenterCrop -> ToTensor -> Normalize"
+  },
+  "golden_sample": {
+    "sample_count": 20,
+    "reference": "cxrclip.data.data_utils.load_transform/transform_image",
+    "operation_order": "load RGB -> Resize -> CenterCrop -> ToTensor -> Normalize",
+    "shape_passed": true,
+    "max_mean_abs_difference": 2.2351741790771484E-8,
+    "max_std_abs_difference": 0.0,
+    "max_abs_pixel_difference": 0.0,
+    "allclose_atol_1e-7": true,
+    "train_fixed_seed": {
+      "sample_count": 10,
+      "max_abs_pixel_difference": 0.0,
+      "allclose_atol_1e-7": true,
+      "samples": [
+        {
+          "index": 212258,
+          "dicom_id": "e416ba54-74784ab2-363b67c1-3640f93c-36522beb",
+          "seed": 20261917,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 223108,
+          "dicom_id": "eff77471-a8a3306d-4f7878d5-5fac5b36-db1ca2a7",
+          "seed": 20261918,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 126118,
+          "dicom_id": "8759840a-c56eb088-7466af23-31e526f3-233be146",
+          "seed": 20261919,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 235283,
+          "dicom_id": "fd22936f-f95f504b-ca3ad67a-c532e2b5-62ea9db5",
+          "seed": 20261920,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 174878,
+          "dicom_id": "bbeb713e-660748c0-033a98a3-5af63303-b06b4b7d",
+          "seed": 20261921,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 216133,
+          "dicom_id": "e84e3c18-5782d848-3eee3ce9-69db39e5-f6499039",
+          "seed": 20261922,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 103906,
+          "dicom_id": "6fa38bba-90548ed5-2980df9c-62e5a3fc-2b9b5a25",
+          "seed": 20261923,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 5481,
+          "dicom_id": "05e0c0be-9c23d66a-9bc115a9-dd034da5-00ccbfb1",
+          "seed": 20261924,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 97955,
+          "dicom_id": "69492cb5-b0a62b4c-ef253f37-58bfe604-0a121184",
+          "seed": 20261925,
+          "max_abs_pixel_difference": 0.0
+        },
+        {
+          "index": 189582,
+          "dicom_id": "cbb44923-27c226e8-d5ce380b-f593f863-7cdb64ab",
+          "seed": 20261926,
+          "max_abs_pixel_difference": 0.0
+        }
+      ]
+    },
+    "samples": [
+      {
+        "split": "valid",
+        "index": 1262,
+        "dicom_id": "a6bfecfe-281e20c1-3d9a3002-ebed7792-aa0c7f47",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 6.51925802230835E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 267,
+        "dicom_id": "20fd8602-76e94ccd-74b97075-b4acc96c-22816e41",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 1.862645149230957E-8,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 1341,
+        "dicom_id": "b22978a8-b5b4125a-08c7a341-112606a4-cbd852a9",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 2.2351741790771484E-8,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 1542,
+        "dicom_id": "ccdac225-47c7b48e-79a78b1c-a6ac307c-ae6bea97",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 3.725290298461914E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 1814,
+        "dicom_id": "edd6b83c-688ee075-7706abe7-8585945e-88b5d0c7",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 0.0,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 635,
+        "dicom_id": "5157469a-594f980c-2c516e5d-6ff794c7-969d1854",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 0.0,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 532,
+        "dicom_id": "436a33ef-05436b90-941301ea-3e5c29aa-85fa6307",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 9.313225746154785E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 1138,
+        "dicom_id": "92846817-78ec0a2e-50265c40-0e7cad3b-6d912f6e",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 7.450580596923828E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 484,
+        "dicom_id": "3d798d0a-869fac09-5939ab06-011a871f-2f43260b",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 0.0,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "valid",
+        "index": 9,
+        "dicom_id": "011b341a-aa4cf984-beef2741-bca288fe-598f5273",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 1.0244548320770264E-8,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 585,
+        "dicom_id": "2e2e7a5d-da7ea8dc-7b5aae28-24978ba4-346238f9",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 1.4901161193847656E-8,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 1527,
+        "dicom_id": "74ab0576-165250aa-5fedc1a0-3f75f2c6-9f87fa70",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 1.30385160446167E-8,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 2255,
+        "dicom_id": "aa20f78f-53dce569-e7263012-3c4ab839-7abbabd4",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 0.0,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 1344,
+        "dicom_id": "66e2a71f-4c89386c-3cd769ac-021891b7-e0b1bf2b",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 3.725290298461914E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 3102,
+        "dicom_id": "e9d9f329-da18eb49-3fe8868a-a0852356-4e2cc1a8",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 7.450580596923828E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 2228,
+        "dicom_id": "a8175445-d55b2d93-a5a3a22c-7662cb0a-6519b608",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 4.6566128730773926E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 2130,
+        "dicom_id": "a0ff876f-331fe46d-c522fdea-c26a2300-676e3cfa",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 3.725290298461914E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 855,
+        "dicom_id": "417162c9-a460e98a-56bf6ab3-b6c591a2-86230b6d",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 0.0,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 2661,
+        "dicom_id": "c855dbbc-7d247e08-21f25260-20ed7254-73ac858a",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 1.862645149230957E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      },
+      {
+        "split": "test",
+        "index": 875,
+        "dicom_id": "42c22f15-803b9ea1-709d9163-e1ec1da8-df4d6d86",
+        "reference_shape": [
+          3,
+          224,
+          224
+        ],
+        "current_shape": [
+          3,
+          224,
+          224
+        ],
+        "mean_abs_difference": 5.587935447692871E-9,
+        "std_abs_difference": 0.0,
+        "max_abs_pixel_difference": 0.0
+      }
+    ]
+  },
+  "image_visual_audit": {
+    "sample_count": 50,
+    "montages": [
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/train_images_montage.png",
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/valid_images_montage.png"
+    ],
+    "nan_images": 0,
+    "image_mean": [
+      -0.023948075249791145,
+      -0.02385587804019451,
+      -0.02394443191587925
+    ],
+    "image_std": [
+      0.5646463632583618,
+      0.5645657777786255,
+      0.5645910501480103
+    ],
+    "manual_review_required": false,
+    "review_items": [
+      "orientation",
+      "left_right_mirroring",
+      "lung_crop",
+      "clahe_strength",
+      "ap_pa_appearance",
+      "grayscale_polarity"
+    ],
+    "nan_scope": "50 sampled train/valid transformed images"
+  },
+  "bbox_audit": {
+    "sample_count": 100,
+    "invalid_bbox_count": 0,
+    "source_bbox_count": 2490,
+    "transformed_bbox_count": 2482,
+    "bbox_survival_rate": 0.9967871485943776,
+    "per_image_survival_p50": 1.0,
+    "per_image_survival_p90": 1.0,
+    "per_image_survival_min": 0.88,
+    "images_below_80_percent_survival": 0,
+    "overlay_directory": "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/bbox_overlays",
+    "montages": [
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/bbox_montage_01.png",
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/bbox_montage_02.png",
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/bbox_montage_03.png",
+      "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/bbox_montage_04.png"
+    ],
+    "manual_review_required": false
+  },
+  "label_roundtrip": {
+    "sample_count": 100,
+    "shuffle_enabled": true,
+    "shuffle_changed_order": true,
+    "mismatch_count": 0,
+    "passed": true,
+    "mismatches": []
+  },
+  "determinism": {
+    "eval": {
+      "valid": {
+        "equal": true,
+        "max_abs_difference": 0.0
+      },
+      "test": {
+        "equal": true,
+        "max_abs_difference": 0.0
+      }
+    },
+    "eval_deterministic": true,
+    "train_outputs_differ": true,
+    "train_max_abs_difference": 2.0
+  },
+  "missing_images": 0,
+  "split_overlap": {
+    "dicom_id": 0,
+    "study_id": 0,
+    "subject_id": 0
+  },
+  "split_overlap_total": 0,
+  "tiny_overfit": {
+    "sample_count": 128,
+    "epochs": 80,
+    "device": "cpu",
+    "model": "TinyCXRBackbone + Linear(10)",
+    "input_transform": "deterministic CXR-CLIP eval transform",
+    "sampling": "stratified with up to 6 explicit positives and 6 explicit negatives per C3 concept",
+    "explicit_counts_by_concept_index": {
+      "0": {
+        "negative": 6,
+        "positive": 6
+      },
+      "1": {
+        "negative": 6,
+        "positive": 11
+      },
+      "2": {
+        "negative": 8,
+        "positive": 8
+      },
+      "3": {
+        "negative": 7,
+        "positive": 8
+      },
+      "4": {
+        "negative": 6,
+        "positive": 6
+      },
+      "5": {
+        "negative": 6,
+        "positive": 8
+      },
+      "6": {
+        "negative": 6,
+        "positive": 8
+      },
+      "7": {
+        "negative": 6,
+        "positive": 7
+      },
+      "8": {
+        "negative": 6,
+        "positive": 6
+      },
+      "9": {
+        "negative": 36,
+        "positive": 29
+      }
+    },
+    "initial": {
+      "epoch": 0,
+      "loss": 0.6936508864164352,
+      "macro_auroc": 0.4613796524356869,
+      "macro_auprc": 0.6118040556336548,
+      "evaluable_concepts": 10
+    },
+    "final": {
+      "epoch": 80,
+      "loss": 0.00035629578633233905,
+      "macro_auroc": 1.0,
+      "macro_auprc": 1.0,
+      "evaluable_concepts": 10
+    },
+    "loss_reduction_fraction": 0.9994863471044159,
+    "passed": true,
+    "history": "/home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/dataset_validation/tiny_overfit_history.json"
+  },
+  "nan_images": 0,
+  "invalid_bbox_count": 0,
+  "eval_deterministic": true,
+  "label_roundtrip_passed": true,
+  "bbox_survival_rate": 0.9967871485943776,
+  "image_mean": [
+    -0.023948075249791145,
+    -0.02385587804019451,
+    -0.02394443191587925
+  ],
+  "image_std": [
+    0.5646463632583618,
+    0.5645657777786255,
+    0.5645910501480103
+  ],
+  "manual_visual_review": {
+    "completed": true,
+    "image_sample_count": 50,
+    "bbox_sample_count": 100,
+    "result": "passed",
+    "orientation": "passed: no vertical inversion",
+    "left_right_mirroring": "passed: no unexpected horizontal flip; anatomical sides follow radiograph display convention",
+    "lung_crop": "passed: no systematic major lung-field loss; minimum sampled bbox survival was 0.88",
+    "clahe_strength": "passed: variable train contrast without systematic over-enhancement",
+    "ap_pa_appearance": "passed",
+    "grayscale_polarity": "passed: no polarity inversion",
+    "bbox_alignment": "passed: transformed boxes remain aligned; clipped boxes and masks are consistent"
+  },
+  "environment": {
+    "path": "/home/user/.venvs/medcbr-cxr-audit",
+    "type": "venv with conceptclip system-site-packages",
+    "python": "3.10.20",
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124",
+    "albumentations": "1.3.1",
+    "opencv": "4.10.0",
+    "pyarrow": "18.1.0",
+    "gpu_note": "RTX 5090 sm_120 is unsupported by this Torch build; tiny-overfit ran on CPU"
+  }
+}

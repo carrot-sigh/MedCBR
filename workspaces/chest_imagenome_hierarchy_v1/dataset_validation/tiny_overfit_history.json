@@ -1,0 +1,149 @@
+[
+  {
+    "epoch": 0,
+    "loss": 0.6936508864164352,
+    "macro_auroc": 0.4613796524356869,
+    "macro_auprc": 0.6118040556336548,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 1,
+    "loss": 0.6843869686126709,
+    "macro_auroc": 0.7429531615415236,
+    "macro_auprc": 0.8013546874095745,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 2,
+    "loss": 0.674054354429245,
+    "macro_auroc": 0.911349952729263,
+    "macro_auprc": 0.9345562173767712,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 3,
+    "loss": 0.8145652562379837,
+    "macro_auroc": 0.9023091133004926,
+    "macro_auprc": 0.9207963061345754,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 4,
+    "loss": 0.8602906763553619,
+    "macro_auroc": 0.8927433198984923,
+    "macro_auprc": 0.915107164664904,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 5,
+    "loss": 0.7618934959173203,
+    "macro_auroc": 0.9347359058565956,
+    "macro_auprc": 0.9416320946605168,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 10,
+    "loss": 0.6867227256298065,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 15,
+    "loss": 0.10770783573389053,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 20,
+    "loss": 0.012235375819727778,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 25,
+    "loss": 0.004933574819006026,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 30,
+    "loss": 0.003101868845988065,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 35,
+    "loss": 0.0018243583326693624,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 40,
+    "loss": 0.0014187718043103814,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 45,
+    "loss": 0.0011059105454478413,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 50,
+    "loss": 0.0009609937114873901,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 55,
+    "loss": 0.0007476001337636262,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 60,
+    "loss": 0.0007697517867200077,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 65,
+    "loss": 0.0005581142177106813,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 70,
+    "loss": 0.0004920657229376957,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 75,
+    "loss": 0.0004344214830780402,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  },
+  {
+    "epoch": 80,
+    "loss": 0.00035629578633233905,
+    "macro_auroc": 1.0,
+    "macro_auprc": 1.0,
+    "evaluable_concepts": 10
+  }
+]

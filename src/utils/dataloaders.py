@@ -528,6 +528,10 @@ def get_metadata_flag(name):
         return name.split("_")[1] if len(name.split("_")) > 1 else ''
 
 def make_bus_data(conf):
+    if conf.data.dataset == "MIMIC_CXR_HIERARCHY":
+        from src.utils.mimic_hierarchy_dataset import make_mimic_hierarchy_loaders
+        return make_mimic_hierarchy_loaders(conf)
+
     num_folds = conf.data.num_folds
     fold = conf.data.fold
     batch_sz = conf.data.batch_size

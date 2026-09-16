@@ -57,9 +57,11 @@ networkx==3.5+computecanada
 numpy==2.2.2+computecanada
 omegaconf==2.3.0+computecanada
 open_clip_torch==3.1.0
+opencv_python_headless>=4.8
 orjson==3.11.1+computecanada
 packaging==25.0+computecanada
 pandas==2.2.3+computecanada
+pyarrow>=18
 parso==0.8.4+computecanada
 pexpect==4.9.0+computecanada
 pillow==11.1.0+computecanada
