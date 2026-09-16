@@ -81,7 +81,7 @@ class BBoxRegionPooler(nn.Module):
                 sampling_ratio=-1,
                 aligned=True,
             ).flatten(1)
-            region_feat[bbox_mask] = self.projection(pooled)
+            region_feat[bbox_mask] = self.projection(pooled).to(region_feat.dtype)
 
         region_feat = region_feat + self.region_embedding.unsqueeze(0)
         region_valid = torch.ones(

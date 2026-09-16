@@ -1,0 +1,39 @@
+ontology_version: hierarchy_v1
+seed: 20260916
+device: auto
+use_amp: true
+
+data:
+  manifest_dir: /home/user/gxq/MedCBR/workspaces/chest_imagenome_hierarchy_v1/manifests
+  image_size: 224
+  batch_size: 32
+  num_workers: 8
+  transform_profile: cxr_clip
+  transform_profile_version: 1
+
+model:
+  backbone: cxr_clip_swin_tiny
+  checkpoint: /home/user/gxq/checkpoints/cxr-clip/swint_m.tar
+  expected_sha256: a2e5dec18b80aad726e4e416b99a09d22d7319cfc58323e17130aa4a56b0c13f
+  spatial_stage: penultimate
+  dim: 768
+  predictor_hidden: 256
+  semantic_hidden: 128
+  c3_hidden: 512
+  dropout: 0.1
+  stop_gradient: true
+  initial_alpha: 0.1
+
+loss_weights:
+  c1: 0.5
+  c2: 0.5
+  c3: 1.0
+
+training:
+  epochs: 4
+  early_stopping_patience: 2
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+
+output_root: /home/user/gxq/MedCBR/workspaces/cxr_hierarchy_screening

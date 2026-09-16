@@ -107,3 +107,17 @@ def test_pooler_accepts_cpu_geometry_with_cuda_features():
     )
     assert region_feat.is_cuda
     assert region_valid.is_cuda
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is unavailable")
+def test_pooler_handles_amp_projection_into_fp32_global_features():
+    pooler = BBoxRegionPooler(spatial_dim=4, output_dim=8, num_regions=1).cuda()
+    with torch.autocast(device_type="cuda", dtype=torch.float16):
+        region_feat, _ = pooler(
+            torch.randn(1, 4, 14, 14, device="cuda"),
+            torch.randn(1, 8, device="cuda", dtype=torch.float32),
+            torch.tensor([[[0, 0, 224, 224]]], dtype=torch.float32),
+            torch.ones(1, 1, dtype=torch.bool),
+            (224, 224),
+        )
+    assert region_feat.dtype == torch.float32
