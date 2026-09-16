@@ -127,7 +127,9 @@ class AuxiliaryConceptPrototype(_HierarchyPrototypeBase):
 
 
 class SemanticFeedbackPrototype(_HierarchyPrototypeBase):
-    """Prototype C: C1 and C2 probabilities explicitly update later latent states."""
+    """Prototype C and parameter-matched zero/shuffled feedback controls."""
+
+    FEEDBACK_MODES = ("semantic", "zero", "shuffle")
 
     def __init__(
         self,
@@ -141,9 +143,13 @@ class SemanticFeedbackPrototype(_HierarchyPrototypeBase):
         dropout: float = 0.1,
         stop_gradient: bool = True,
         initial_alpha: float = 0.1,
+        feedback_mode: str = "semantic",
     ):
         super().__init__(dim, predictor_hidden, num_c1, num_c2, num_c3, c3_hidden, dropout)
+        if feedback_mode not in self.FEEDBACK_MODES:
+            raise ValueError(f"feedback_mode must be one of {self.FEEDBACK_MODES}")
         self.stop_gradient = bool(stop_gradient)
+        self.feedback_mode = feedback_mode
         self.c1_feedback = SemanticFeedback(
             num_c1, semantic_hidden, dim, dropout, initial_alpha
         )
@@ -154,6 +160,13 @@ class SemanticFeedbackPrototype(_HierarchyPrototypeBase):
         self.norm2 = nn.LayerNorm(dim)
 
     def _feedback_input(self, probability: torch.Tensor) -> torch.Tensor:
+        if self.feedback_mode == "zero":
+            probability = torch.zeros_like(probability)
+        elif self.feedback_mode == "shuffle":
+            # A deterministic cyclic permutation over batch-region states breaks
+            # alignment while preserving the empirical semantic distribution.
+            flattened = probability.flatten(0, 1)
+            probability = torch.roll(flattened, shifts=1, dims=0).view_as(probability)
         return probability.detach() if self.stop_gradient else probability
 
     def forward(self, global_feat, region_feat, region_mask=None):

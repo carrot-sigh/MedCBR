@@ -68,3 +68,36 @@ def test_region_mask_shape_is_validated():
     model = SemanticFeedbackPrototype(dim=8, predictor_hidden=4, semantic_hidden=3)
     with pytest.raises(ValueError, match="region_mask"):
         model(torch.randn(2, 8), torch.randn(2, 32, 8), torch.ones(2, 31, dtype=torch.bool))
+
+
+def test_zero_control_keeps_architecture_but_removes_semantic_input():
+    semantic = SemanticFeedbackPrototype(
+        dim=8, predictor_hidden=4, semantic_hidden=3, feedback_mode="semantic"
+    )
+    zero = SemanticFeedbackPrototype(
+        dim=8, predictor_hidden=4, semantic_hidden=3, feedback_mode="zero"
+    )
+    assert sum(p.numel() for p in semantic.parameters()) == sum(p.numel() for p in zero.parameters())
+    probability = torch.rand(2, 32, 5)
+    assert torch.count_nonzero(zero._feedback_input(probability)) == 0
+
+
+def test_shuffle_control_is_deterministic_and_preserves_distribution():
+    model = SemanticFeedbackPrototype(
+        dim=8, predictor_hidden=4, semantic_hidden=3,
+        feedback_mode="shuffle", stop_gradient=False,
+    )
+    probability = torch.arange(2 * 32 * 5, dtype=torch.float32).view(2, 32, 5)
+    shuffled_a = model._feedback_input(probability)
+    shuffled_b = model._feedback_input(probability)
+    assert torch.equal(shuffled_a, shuffled_b)
+    assert not torch.equal(shuffled_a, probability)
+    assert torch.equal(
+        shuffled_a.flatten().sort().values,
+        probability.flatten().sort().values,
+    )
+
+
+def test_invalid_feedback_mode_is_rejected():
+    with pytest.raises(ValueError, match="feedback_mode"):
+        SemanticFeedbackPrototype(feedback_mode="invalid")
