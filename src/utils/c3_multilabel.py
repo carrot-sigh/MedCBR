@@ -13,7 +13,7 @@ from sklearn.metrics import average_precision_score, f1_score, precision_recall_
 def masked_bce_with_logits(
     logits: torch.Tensor, target: torch.Tensor, mask: torch.Tensor
 ) -> torch.Tensor:
-    """Compute BCE only for explicit C3 assertions; unknown -1 entries are ignored."""
+    """Compute BCE only for explicit assertions at any hierarchy level."""
     if logits.shape != target.shape or logits.shape != mask.shape:
         raise ValueError(
             f"Shape mismatch: logits={logits.shape}, target={target.shape}, mask={mask.shape}"
