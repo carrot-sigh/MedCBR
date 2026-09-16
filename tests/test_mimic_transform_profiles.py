@@ -9,6 +9,7 @@ from src.utils.mimic_hierarchy_dataset import (
     CXRImageTransform,
     TRANSFORM_PROFILES,
     build_transform,
+    transform_profile_metadata,
 )
 
 
@@ -56,3 +57,27 @@ def test_profiles_return_uniform_image_and_bbox_contract(profile):
 def test_unknown_profile_is_rejected():
     with pytest.raises(ValueError, match="Unknown transform profile"):
         build_transform("unknown", "train", 224)
+
+
+def test_profile_metadata_is_complete_and_versioned():
+    metadata = transform_profile_metadata("vit", 224, expected_version=1)
+    assert metadata == {
+        "profile": "vit",
+        "version": 1,
+        "image_size": 224,
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225],
+        "interpolation": "bicubic",
+        "train_random_resized_crop_scale": [0.8, 1.0],
+        "train_random_resized_crop_ratio": [0.75, 4 / 3],
+        "eval_resize_short_edge": 224,
+        "eval_center_crop": 224,
+        "crop_pct": 1.0,
+        "clahe": False,
+        "color_jitter": False,
+    }
+
+
+def test_profile_version_mismatch_is_rejected():
+    with pytest.raises(ValueError, match="version mismatch"):
+        build_transform("vit", "train", 224, expected_version=2)

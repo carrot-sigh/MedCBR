@@ -44,6 +44,7 @@ def verify_frozen_hierarchy(manifest_dir: str | Path) -> None:
 class TransformProfile:
     """Backbone-specific image preprocessing parameters."""
 
+    version: int
     normalize: str
     clahe: bool
     color_jitter: bool
@@ -53,15 +54,15 @@ class TransformProfile:
 
 TRANSFORM_PROFILES = {
     "cxr_clip": TransformProfile(
-        normalize="huggingface", clahe=True, color_jitter=True,
+        version=1, normalize="huggingface", clahe=True, color_jitter=True,
         interpolation=InterpolationMode.BILINEAR, train_crop_scale=(0.8, 1.1),
     ),
     "vit": TransformProfile(
-        normalize="imagenet", clahe=False, color_jitter=False,
+        version=1, normalize="imagenet", clahe=False, color_jitter=False,
         interpolation=InterpolationMode.BICUBIC, train_crop_scale=(0.8, 1.0),
     ),
     "dinov2": TransformProfile(
-        normalize="imagenet", clahe=False, color_jitter=False,
+        version=1, normalize="imagenet", clahe=False, color_jitter=False,
         interpolation=InterpolationMode.BICUBIC, train_crop_scale=(0.8, 1.0),
     ),
 }
@@ -172,13 +173,40 @@ class CXRImageTransform:
         return image, torch.from_numpy(bboxes), torch.from_numpy(bbox_mask)
 
 
-def build_transform(profile="cxr_clip", split="train", image_size=224):
-    """Build a bbox-aware transform for a named backbone profile."""
+def transform_profile_metadata(profile="cxr_clip", image_size=224, expected_version=None):
+    """Resolve a profile into JSON-serializable, versioned experiment metadata."""
     try:
         spec = TRANSFORM_PROFILES[profile]
     except KeyError as exc:
         choices = ", ".join(sorted(TRANSFORM_PROFILES))
         raise ValueError(f"Unknown transform profile {profile!r}; choose one of: {choices}") from exc
+    if expected_version is not None and int(expected_version) != spec.version:
+        raise ValueError(
+            f"Transform profile {profile!r} version mismatch: "
+            f"config={expected_version}, registry={spec.version}"
+        )
+    mean, std = CXRImageTransform.NORMALIZATION[spec.normalize]
+    return {
+        "profile": profile,
+        "version": spec.version,
+        "image_size": int(image_size),
+        "mean": list(mean),
+        "std": list(std),
+        "interpolation": spec.interpolation.value,
+        "train_random_resized_crop_scale": list(spec.train_crop_scale),
+        "train_random_resized_crop_ratio": [3 / 4, 4 / 3],
+        "eval_resize_short_edge": int(image_size),
+        "eval_center_crop": int(image_size),
+        "crop_pct": 1.0,
+        "clahe": spec.clahe,
+        "color_jitter": spec.color_jitter,
+    }
+
+
+def build_transform(profile="cxr_clip", split="train", image_size=224, expected_version=None):
+    """Build a bbox-aware transform for a named backbone profile."""
+    transform_profile_metadata(profile, image_size, expected_version)
+    spec = TRANSFORM_PROFILES[profile]
     return CXRImageTransform(
         image_size=image_size,
         split=split,
@@ -205,6 +233,7 @@ class MIMICHierarchyV1Dataset(Dataset):
         split,
         image_size=224,
         transform_profile="cxr_clip",
+        transform_profile_version=None,
         transform: Callable | None = None,
         normalize=None,
         clahe=None,
@@ -220,6 +249,7 @@ class MIMICHierarchyV1Dataset(Dataset):
         self.split = split
         self.table = pq.read_table(self.manifest_dir / SPLIT_FILES[split], memory_map=True)
         self.transform_profile = transform_profile
+        self.transform_profile_version = transform_profile_version
         if transform is not None and (normalize is not None or clahe is not None):
             raise ValueError("normalize/clahe overrides cannot be combined with a custom transform")
         if transform is not None:
@@ -233,7 +263,9 @@ class MIMICHierarchyV1Dataset(Dataset):
                 True if clahe is None else bool(clahe),
             )
         else:
-            self.transform = build_transform(transform_profile, split, image_size)
+            self.transform = build_transform(
+                transform_profile, split, image_size, transform_profile_version
+            )
 
     def __len__(self):
         return self.table.num_rows
@@ -274,6 +306,7 @@ def make_mimic_hierarchy_loaders(config):
     common = {
         "manifest_dir": manifest_dir, "image_size": int(config.data.image_size),
         "transform_profile": str(getattr(config.data, "transform_profile", "cxr_clip")),
+        "transform_profile_version": getattr(config.data, "transform_profile_version", None),
     }
     datasets = {split: MIMICHierarchyV1Dataset(split=split, **common) for split in SPLIT_FILES}
     workers = int(config.data.num_workers)

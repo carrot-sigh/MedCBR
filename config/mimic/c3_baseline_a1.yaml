@@ -9,6 +9,7 @@ data:
   batch_size: 32
   num_workers: 8
   transform_profile: cxr_clip
+  transform_profile_version: 1
 
 model:
   type: cxrclip_swin_tiny

@@ -32,6 +32,7 @@ from src.utils.c3_multilabel import (
 from src.utils.mimic_hierarchy_dataset import (
     MIMICHierarchyV1Dataset,
     ONTOLOGY_VERSION,
+    transform_profile_metadata,
     verify_frozen_hierarchy,
 )
 
@@ -123,6 +124,7 @@ def make_loaders(config, rank=0, world_size=1):
         "manifest_dir": manifest_dir,
         "image_size": int(data["image_size"]),
         "transform_profile": data.get("transform_profile", "cxr_clip"),
+        "transform_profile_version": data.get("transform_profile_version"),
     }
     datasets = {
         split: MIMICHierarchyV1Dataset(split=split, **common)
@@ -403,11 +405,19 @@ def train(config, args):
         "path": str(checkpoint_path.resolve()),
         "sha256": checkpoint_digest,
     }
+    preprocessing_metadata = transform_profile_metadata(
+        config["data"].get("transform_profile", "cxr_clip"),
+        config["data"]["image_size"],
+        config["data"].get("transform_profile_version"),
+    )
+    resolved_config = {
+        **config,
+        "checkpoint_metadata": checkpoint_metadata,
+        "preprocessing_metadata": preprocessing_metadata,
+        "world_size": world_size,
+    }
     if is_main:
-        save_json(
-            output_dir / "resolved_config.json",
-            {**config, "checkpoint_metadata": checkpoint_metadata, "world_size": world_size},
-        )
+        save_json(output_dir / "resolved_config.json", resolved_config)
 
     history = []
     best_auprc = float("-inf")
@@ -458,7 +468,8 @@ def train(config, args):
                         "ontology_version": ONTOLOGY_VERSION,
                         "c3_concepts": class_names,
                         "checkpoint_metadata": checkpoint_metadata,
-                        "config": config,
+                        "preprocessing_metadata": preprocessing_metadata,
+                        "config": resolved_config,
                     },
                     best_path,
                 )

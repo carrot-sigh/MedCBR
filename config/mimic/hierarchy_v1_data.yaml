@@ -8,6 +8,7 @@ data:
   num_workers: 8
   pin_memory: true
   transform_profile: cxr_clip
+  transform_profile_version: 1
   shapes:
     regions: 32
     c1: 5
